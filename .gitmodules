@@ -1,0 +1,8 @@
+[submodule "third/fmt"]
+	path = third/fmt
+	url = https://github.com/fmtlib/fmt.git
+	branch = master
+[submodule "third/glfw"]
+	path = third/glfw
+	url = https://github.com/glfw/glfw.git
+	branch = master

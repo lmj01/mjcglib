@@ -1,6 +1,7 @@
 // src/lib.cc
 #include <mylib/lib.h>
 #include <iostream>
+#include <fmt/core.h>
 
 namespace mylib {
 
@@ -13,7 +14,7 @@ void foo() {
 void bar()
 {
     std::cout << "bar function" << std::endl;
-//   fmt::print("hello fmtlib\n");
+    fmt::print("hello fmtlib\n");
 }
 
 } // namespace mylib

@@ -14,3 +14,7 @@
 	path = third/glm
 	url = https://github.com/g-truc/glm.git
 	branch = master
+[submodule "third/lnlib"]
+	path = third/lnlib
+	url = https://github.com/BIMCoderLiang/LNLib.git
+	branch = main

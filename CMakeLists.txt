@@ -65,6 +65,13 @@ glad_add_library(glad_gl_core_mx_46 REPRODUCIBLE MX API gl:core=4.6)
 
 # -- glad --
 
+# -- lnlib --
+
+set(ENABLE_UNIT_TESTS OFF CACHE BOOL "" FORCE)
+add_subdirectory("${SUBMODULE_DIR}/lnlib")
+
+# -- lnlib --
+
 
 # Found all source files
 file(GLOB_RECURSE SOURCE_FILES "${PROJECT_SOURCE_DIR}/src/*.cc")

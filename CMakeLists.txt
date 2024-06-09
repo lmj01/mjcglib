@@ -17,9 +17,18 @@ if(NOT EXISTS "${SUBMODULE_DIR}/fmt/CMakeLists.txt")
     message(FATAL_ERROR "Submodule 'fmt' was not downloaded! Please update submodules and try again.")
 endif()
 
+# problem with shared library can't link static library
+# relocation R_X86_64_PC32 against symbol can not be used when making a shared object; recompile with -fPIC
+# set (CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_CXX_FLAGS "-fPIC")
+
 # Disable targets that are not needed
 set(FMT_DOC OFF CACHE BOOL "" FORCE)
 set(FMT_TEST OFF CACHE BOOL "" FORCE)
+set(FMT_FUZZ OFF CACHE BOOL "" FORCE)
+set(FMT_CUDA_TEST OFF CACHE BOOL "" FORCE)
+set(FMT_OS OFF CACHE BOOL "" FORCE)
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 add_subdirectory("${SUBMODULE_DIR}/fmt")
 
 # -- fmt --
@@ -33,6 +42,7 @@ endif()
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_WAYLAND OFF CACHE BOOL "" FORCE)
 add_subdirectory("${SUBMODULE_DIR}/glfw")
 
 # -- GLFW --
@@ -44,6 +54,9 @@ message(STATUS "Found ${SRC_FILES_SIZE} source files of mjcg")
 
 # Define a shared library target named `mjcg`
 add_library(mjcg SHARED)
+
+# A workaround is to turn of position independent execution (PIE) 
+target_link_options(mjcg PRIVATE "-no-pie")
 
 # Specify source files for target named `mjcg`
 target_sources(mjcg PRIVATE ${SOURCE_FILES})
@@ -64,3 +77,5 @@ target_link_libraries(${PROJECT_NAME} $<BUILD_INTERFACE:glfw>)
 
 # Request compile features for target named `mjcg`
 target_compile_features(mjcg PUBLIC cxx_std_20)
+
+# add_executable(app1 )

@@ -6,3 +6,7 @@
 	path = third/glfw
 	url = https://github.com/glfw/glfw.git
 	branch = master
+[submodule "third/glad"]
+	path = third/glad
+	url = https://github.com/lmj01/glad
+	branch = glad2

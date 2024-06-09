@@ -3,7 +3,7 @@ project(
     mjcg
     VERSION 1.0.1
     DESCRIPTION "First release of mjcg"
-    LANGUAGES CXX
+    LANGUAGES C CXX
 )
 
 # Enable linking of this library on windows
@@ -47,6 +47,16 @@ add_subdirectory("${SUBMODULE_DIR}/glfw")
 
 # -- GLFW --
 
+# -- glad --
+
+set(GLAD_SOURCES_DIR "${PROJECT_SOURCE_DIR}/third/glad")
+add_subdirectory("${GLAD_SOURCES_DIR}/cmake" glad_cmake)
+
+glad_add_library(glad_gl_core_mx_46 REPRODUCIBLE MX API gl:core=4.6)
+
+# -- glad --
+
+
 # Found all source files
 file(GLOB_RECURSE SOURCE_FILES "${PROJECT_SOURCE_DIR}/src/*.cc")
 list(LENGTH SOURCE_FILES SRC_FILES_SIZE)
@@ -68,9 +78,8 @@ target_include_directories(mjcg PUBLIC
 )
 
 # Specify the link directories for the target named `mjcg`
-# target_link_libraries(mjcg PUBLIC
-#     fmt::fmt
-#     # ${TORCH_LIBRARIES}
+# target_link_libraries(mjcg PUBLIC   
+#     glad_gl_core_mx_46
 # )
 target_link_libraries(${PROJECT_NAME} $<BUILD_INTERFACE:fmt>)
 target_link_libraries(${PROJECT_NAME} $<BUILD_INTERFACE:glfw>)
@@ -78,4 +87,13 @@ target_link_libraries(${PROJECT_NAME} $<BUILD_INTERFACE:glfw>)
 # Request compile features for target named `mjcg`
 target_compile_features(mjcg PUBLIC cxx_std_20)
 
-# add_executable(app1 )
+# --- app1 ---
+# Found all source files
+file(GLOB_RECURSE SOURCE_APP1 "${PROJECT_SOURCE_DIR}/src/app/app1.cpp")
+
+add_executable(app1 ${SOURCE_APP1})
+target_link_libraries(app1  PUBLIC
+    glad_gl_core_mx_46
+    glfw
+)
+# --- app1 ---

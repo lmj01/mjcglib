@@ -47,6 +47,15 @@ add_subdirectory("${SUBMODULE_DIR}/glfw")
 
 # -- GLFW --
 
+# -- GLM --
+if(NOT EXISTS "${SUBMODULE_DIR}/glm/CMakeLists.txt")
+    message(FATAL_ERROR "Submodule 'GLM' was not downloaded! Please update submodules and try again.")
+endif() 
+
+add_subdirectory("${SUBMODULE_DIR}/glm")
+
+# -- GLM --
+
 # -- glad --
 
 set(GLAD_SOURCES_DIR "${PROJECT_SOURCE_DIR}/third/glad")
@@ -83,9 +92,20 @@ target_include_directories(mjcg PUBLIC
 # )
 target_link_libraries(${PROJECT_NAME} $<BUILD_INTERFACE:fmt>)
 target_link_libraries(${PROJECT_NAME} $<BUILD_INTERFACE:glfw>)
+target_link_libraries(${PROJECT_NAME} $<BUILD_INTERFACE:glm>)
 
 # Request compile features for target named `mjcg`
 target_compile_features(mjcg PUBLIC cxx_std_20)
+
+# --- app0 ---
+# Found all source files
+file(GLOB_RECURSE SOURCE_APP0 "${PROJECT_SOURCE_DIR}/src/app/app0.cpp")
+
+add_executable(app0 ${SOURCE_APP0})
+target_link_libraries(app0  PUBLIC
+    mjcg
+)
+# --- app0 ---
 
 # --- app1 ---
 # Found all source files

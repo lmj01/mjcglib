@@ -6,6 +6,13 @@ project(
     LANGUAGES C CXX
 )
 
+# set the install folder
+if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT) 
+    message(STATUS "Setting default CMAKE_INSTALL_PREFIX path to ${CMAKE_BINARY_DIR}/install")
+    set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/install" CACHE STRING "the path to use make install" FORCE)
+endif()
+
+
 # Enable linking of this library on windows
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS 1)
 
@@ -124,3 +131,20 @@ target_link_libraries(app1  PUBLIC
     glfw
 )
 # --- app1 ---
+
+# Defines the ${CMAKE_INSTALL_INCLUDEDIR} and ${CMAKE_INSTALL_LIBDIR} variable.
+include(GNUInstallDirs)
+
+# Make executable target `mylib` installable
+install(TARGETS mjcg
+        EXPORT mjcg-targets
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+# Install the header files
+install(
+    DIRECTORY ${PROJECT_SOURCE_DIR}/include/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)

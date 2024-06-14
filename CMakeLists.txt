@@ -25,9 +25,11 @@ if(NOT EXISTS "${SUBMODULE_DIR}/fmt/CMakeLists.txt")
 endif()
 
 # problem with shared library can't link static library
-# relocation R_X86_64_PC32 against symbol can not be used when making a shared object; recompile with -fPIC
-# set (CMAKE_POSITION_INDEPENDENT_CODE ON)
-set(CMAKE_CXX_FLAGS "-fPIC")
+if (CMAKE_HOST_UNIX)
+    # relocation R_X86_64_PC32 against symbol can not be used when making a shared object; recompile with -fPIC
+    # set (CMAKE_POSITION_INDEPENDENT_CODE ON)
+    set(CMAKE_CXX_FLAGS "-fPIC")
+endif()
 
 # Disable targets that are not needed
 set(FMT_DOC OFF CACHE BOOL "" FORCE)
@@ -64,12 +66,13 @@ add_subdirectory("${SUBMODULE_DIR}/glm")
 # -- GLM --
 
 # -- glad --
-
+set(GLAD_GEN_DIR "${PROJECT_SOURCE_DIR}/third/glad/generated")
 set(GLAD_SOURCES_DIR "${PROJECT_SOURCE_DIR}/third/glad")
 add_subdirectory("${GLAD_SOURCES_DIR}/cmake" glad_cmake)
 
-glad_add_library(glad_gl_core_mx_46 REPRODUCIBLE MX API gl:core=4.6)
-
+# glad_gl_core_mx_46
+glad_add_library(glad REPRODUCIBLE MX LOCATION "${GLAD_GEN_DIR}" API gl:core=4.6)
+set(GLAD_INCLUDE_DIR "${GLAD_GEN_DIR}/include")
 # -- glad --
 
 # -- lnlib --
@@ -81,54 +84,73 @@ add_subdirectory("${SUBMODULE_DIR}/lnlib")
 
 
 # Found all source files
-file(GLOB_RECURSE SOURCE_FILES "${PROJECT_SOURCE_DIR}/src/*.cc")
+file(GLOB_RECURSE SOURCE_FILES "${PROJECT_SOURCE_DIR}/src/*.*")
 list(LENGTH SOURCE_FILES SRC_FILES_SIZE)
-message(STATUS "Found ${SRC_FILES_SIZE} source files of mjcg")
+message(STATUS "Found ${SRC_FILES_SIZE} source files of ${PROJECT_NAME}")
 
-# Define a shared library target named `mjcg`
-add_library(mjcg SHARED)
+# Define a shared library target named 
+add_library(${PROJECT_NAME} SHARED)
 
-# A workaround is to turn of position independent execution (PIE) 
-target_link_options(mjcg PRIVATE "-no-pie")
+if (CMAKE_HOST_UNIX)
+    # A workaround is to turn of position independent execution (PIE) 
+    target_link_options(${PROJECT_NAME} PRIVATE "-no-pie")
+endif()
 
-# Specify source files for target named `mjcg`
-target_sources(mjcg PRIVATE ${SOURCE_FILES})
+# Specify source files for target
+target_sources(${PROJECT_NAME} 
+    PRIVATE 
+        ${SOURCE_FILES}
+)
 
-# Specify the include directories for the target named `mjcg`
-target_include_directories(mjcg PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+include_directories(${GLAD_INCLUDE_DIR}) # glad
+include_directories("${SUBMODULE_DIR}/glm") # glm
+include_directories("${SUBMODULE_DIR}/glfw/include") # glm
+# Specify the include directories for the target
+target_include_directories(${PROJECT_NAME}
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${GLAD_INCLUDE_DIR}>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+    PRIVATE 
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
 # Specify the link directories for the target named `mjcg`
-# target_link_libraries(mjcg PUBLIC   
-#     glad_gl_core_mx_46
-# )
-target_link_libraries(${PROJECT_NAME} $<BUILD_INTERFACE:fmt>)
-target_link_libraries(${PROJECT_NAME} $<BUILD_INTERFACE:glfw>)
-target_link_libraries(${PROJECT_NAME} $<BUILD_INTERFACE:glm>)
+target_link_libraries(${PROJECT_NAME} 
+    # PUBLIC glad
+    PUBLIC $<BUILD_INTERFACE:fmt>
+    PUBLIC $<BUILD_INTERFACE:glfw>
+    PUBLIC $<BUILD_INTERFACE:glm>
+    PUBLIC $<BUILD_INTERFACE:glad>
+)
 
 # Request compile features for target named `mjcg`
 target_compile_features(mjcg PUBLIC cxx_std_20)
 
 # --- app0 ---
 # Found all source files
-file(GLOB_RECURSE SOURCE_APP0 "${PROJECT_SOURCE_DIR}/src/app/app0.cpp")
+file(GLOB_RECURSE SOURCE_APP0 "${PROJECT_SOURCE_DIR}/app/app0.cpp")
 
 add_executable(app0 ${SOURCE_APP0})
-target_link_libraries(app0  PUBLIC
-    mjcg
+target_link_libraries(app0
+    PUBLIC
+        mjcg
 )
 # --- app0 ---
 
 # --- app1 ---
 # Found all source files
-file(GLOB_RECURSE SOURCE_APP1 "${PROJECT_SOURCE_DIR}/src/app/app1.cpp")
-
+set(app1)
+file(GLOB_RECURSE SOURCE_APP1 "${PROJECT_SOURCE_DIR}/app/app1.cpp")
 add_executable(app1 ${SOURCE_APP1})
-target_link_libraries(app1  PUBLIC
-    glad_gl_core_mx_46
-    glfw
+target_include_directories (app1 
+    PRIVATE 
+        ${GLAD_INCLUDE_DIR}
+)
+target_link_libraries(app1
+    PUBLIC
+        glad
+        glfw
 )
 # --- app1 ---
 

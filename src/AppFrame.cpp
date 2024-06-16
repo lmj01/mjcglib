@@ -45,8 +45,8 @@ AppFrame::AppFrame(ScreenResolution resolution, App * app, std::string title) {
         std::cout << "initialising glfw" << std::endl;    
     }
     glfwSetErrorCallback( error_callback );
-    // glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 4 );
-    // glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 6 );
+    glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 4 );
+    glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 6 );
     // If you want the opengl debug context from 4.3 onwards, which you do:
     glfwWindowHint( GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE );
     glfwWindowHint( GLFW_CLIENT_API, GLFW_OPENGL_API );
@@ -61,9 +61,6 @@ AppFrame::AppFrame(ScreenResolution resolution, App * app, std::string title) {
     }
     glfwMakeContextCurrent(this->window);
 
-    // spGlContext(new GladGLContext());
-    
-    // glContext = (GladGLContext*) calloc(1, sizeof(GladGLContext));
     if (!spGlContext.get()) {
         glfwTerminate();
         throw std::runtime_error("Failed to initialize GLAD!");

@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <glm/vec2.hpp>
 #include <memory>
+#include <string>
 
 namespace mygl {
     struct ScreenResolution;
@@ -28,7 +29,13 @@ private:
     Mouse();
     Mouse(const Mouse&);
     Mouse(double x, double y);
-    Mouse & operator = (const Mouse &);
+    Mouse & operator = (const Mouse &other) {
+        if (this != &other) {
+            pos.x = other.pos.x;
+            pos.y = other.pos.y;
+        }
+        return *this;
+    }
 public:
     static Mouse& getInstance() {
         static Mouse instance;
@@ -50,7 +57,7 @@ private:
     App * app;
     void processInput(GLFWwindow * window);
 public:
-    AppFrame(ScreenResolution resolution, App * app, const char* title = "OpenGL");
+    AppFrame(ScreenResolution resolution, App * app, std::string title);
     ~AppFrame();
 
     bool render();

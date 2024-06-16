@@ -12,8 +12,8 @@ Mouse::Mouse(double x, double y) {
 }
 
 Mouse::~Mouse() {
-    delete &pos_old;
-    delete &pos;
+    // delete &pos_old;
+    // delete &pos;
 }
 
 glm::vec2 Mouse::getPosition() {
@@ -31,16 +31,35 @@ glm::vec2 Mouse::getOffset() {
 
 std::shared_ptr<GladGLContext> AppFrame::spGlContext = std::make_shared<GladGLContext>();
 
-AppFrame::AppFrame(ScreenResolution resolution, App * app, const char *title) {
+void error_callback( int error, const char *msg ) {
+    std::string s;
+    s = " [" + std::to_string(error) + "] " + msg + '\n';
+    std::cerr << s << std::endl;
+}
+
+AppFrame::AppFrame(ScreenResolution resolution, App * app, std::string title) {
+    glfwSetErrorCallback( error_callback );
+    if (GL_TRUE != glfwInit()) {
+        std::cerr << "Error initialising glfw" << std::endl;    
+    } else {
+        std::cout << "initialising glfw" << std::endl;    
+    }
+    glfwSetErrorCallback( error_callback );
+    // glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 4 );
+    // glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 6 );
+    // If you want the opengl debug context from 4.3 onwards, which you do:
+    glfwWindowHint( GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE );
+    glfwWindowHint( GLFW_CLIENT_API, GLFW_OPENGL_API );
+    glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
+
+    std::cout << "Title :" << title << std::endl;
     this->resolution = resolution;
-    this->window = glfwCreateWindow(resolution.width, resolution.height, title, NULL, NULL);
+    this->window = glfwCreateWindow(resolution.width, resolution.height, title.c_str(), NULL, NULL);
     if (!this->window) {
         glfwTerminate();
         throw std::runtime_error("Failed to create GLFW window!");
     }
     glfwMakeContextCurrent(this->window);
-
-    glfwMakeContextCurrent(window);
 
     // spGlContext(new GladGLContext());
     

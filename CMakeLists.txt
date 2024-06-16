@@ -89,7 +89,10 @@ list(LENGTH SOURCE_FILES SRC_FILES_SIZE)
 message(STATUS "Found ${SRC_FILES_SIZE} source files of ${PROJECT_NAME}")
 
 # Define a shared library target named 
-add_library(${PROJECT_NAME} SHARED)
+add_library(${PROJECT_NAME} 
+    SHARED
+    # STATIC
+)
 
 if (CMAKE_HOST_UNIX)
     # A workaround is to turn of position independent execution (PIE) 

@@ -49,15 +49,14 @@ AppFrame::AppFrame(ScreenResolution resolution, App * app, std::string title) {
     }
     glfwMakeContextCurrent(this->window);
 
+    glfwSetFramebufferSizeCallback(this->window, &AppFrame::framebufferSizeCallback);
+
+    glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
     int version = gladLoadGL(glfwGetProcAddress);
     std::cout << "Loaded OpenGL " << GLAD_VERSION_MAJOR(version) << "." << GLAD_VERSION_MINOR(version) << std::endl;
     unsigned int glVersion = 100 * GLAD_VERSION_MAJOR(version) + 10 * GLAD_VERSION_MINOR(version);
-    glfwSetFramebufferSizeCallback(this->window, &AppFrame::framebufferSizeCallback);
-    if (glVersion >= 430) {
-        glfwWindowHint( GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE );
-        glfwWindowHint( GLFW_CLIENT_API, GLFW_OPENGL_API );
-        glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
-    }
+
     app->setVersion(glVersion);
     this->app = app;
 }

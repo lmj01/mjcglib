@@ -66,12 +66,16 @@ add_subdirectory("${SUBMODULE_DIR}/glm")
 # -- GLM --
 
 # -- glad --
-set(GLAD_GEN_DIR "${PROJECT_SOURCE_DIR}/third/glad/generated")
-set(GLAD_SOURCES_DIR "${PROJECT_SOURCE_DIR}/third/glad")
-add_subdirectory("${GLAD_SOURCES_DIR}/cmake" glad_cmake)
+# set(GLAD_GEN_DIR "${PROJECT_SOURCE_DIR}/third/glad/generated")
+set(GLAD_GEN_DIR "${PROJECT_SOURCE_DIR}/third/gladGen")
 
-# glad_gl_core_mx_46
-glad_add_library(glad REPRODUCIBLE MX LOCATION "${GLAD_GEN_DIR}" API gl:core=4.6)
+# if (NOT EXISTS "${GLAD_GEN_DIR}/args.txt")
+    set(GLAD_SOURCES_DIR "${PROJECT_SOURCE_DIR}/third/glad")
+    add_subdirectory("${GLAD_SOURCES_DIR}/cmake" glad_cmake)
+    glad_add_library(glad REPRODUCIBLE LOCATION "${GLAD_GEN_DIR}" API gl:core=4.6)
+# else()
+
+# endif()
 set(GLAD_INCLUDE_DIR "${GLAD_GEN_DIR}/include")
 # -- glad --
 
@@ -90,8 +94,8 @@ message(STATUS "Found ${SRC_FILES_SIZE} source files of ${PROJECT_NAME}")
 
 # Define a shared library target named 
 add_library(${PROJECT_NAME} 
-    SHARED
-    # STATIC
+    # SHARED
+    STATIC
 )
 
 if (CMAKE_HOST_UNIX)
@@ -105,14 +109,14 @@ target_sources(${PROJECT_NAME}
         ${SOURCE_FILES}
 )
 
-include_directories(${GLAD_INCLUDE_DIR}) # glad
+include_directories("${GLAD_INCLUDE_DIR}") # glad
 include_directories("${SUBMODULE_DIR}/glm") # glm
 include_directories("${SUBMODULE_DIR}/glfw/include") # glm
 # Specify the include directories for the target
 target_include_directories(${PROJECT_NAME}
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<BUILD_INTERFACE:${GLAD_INCLUDE_DIR}>
+        # $<BUILD_INTERFACE:${GLAD_INCLUDE_DIR}>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
     PRIVATE 
         ${CMAKE_CURRENT_SOURCE_DIR}/src
@@ -120,11 +124,10 @@ target_include_directories(${PROJECT_NAME}
 
 # Specify the link directories for the target named `mjcg`
 target_link_libraries(${PROJECT_NAME} 
-    # PUBLIC glad
+    PUBLIC glad
     PUBLIC $<BUILD_INTERFACE:fmt>
     PUBLIC $<BUILD_INTERFACE:glfw>
     PUBLIC $<BUILD_INTERFACE:glm>
-    PUBLIC $<BUILD_INTERFACE:glad>
 )
 
 # Request compile features for target named `mjcg`
@@ -143,18 +146,18 @@ target_link_libraries(app0
 
 # --- app1 ---
 # Found all source files
-set(app1)
-file(GLOB_RECURSE SOURCE_APP1 "${PROJECT_SOURCE_DIR}/app/app1.cpp")
-add_executable(app1 ${SOURCE_APP1})
-target_include_directories (app1 
-    PRIVATE 
-        ${GLAD_INCLUDE_DIR}
-)
-target_link_libraries(app1
-    PUBLIC
-        glad
-        glfw
-)
+# set(app1)
+# file(GLOB_RECURSE SOURCE_APP1 "${PROJECT_SOURCE_DIR}/app/app1.cpp")
+# add_executable(app1 ${SOURCE_APP1})
+# target_include_directories (app1 
+#     PRIVATE 
+#         ${GLAD_INCLUDE_DIR}
+# )
+# target_link_libraries(app1
+#     PUBLIC
+#         glad
+#         glfw
+# )
 # --- app1 ---
 
 # Defines the ${CMAKE_INSTALL_INCLUDEDIR} and ${CMAKE_INSTALL_LIBDIR} variable.

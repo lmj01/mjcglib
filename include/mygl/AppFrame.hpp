@@ -1,7 +1,6 @@
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
 #include <glm/vec2.hpp>
-#include <memory>
 #include <string>
 
 namespace mygl {
@@ -63,21 +62,20 @@ public:
     bool render();
     static void framebufferSizeCallback(GLFWwindow * window, int width, int height);
     static void mouse_callback(GLFWwindow * window, double x, double y);
-    static std::shared_ptr<GladGLContext> spGlContext;
 };
 
 class mygl::App
 {
 private:
 protected:
-    std::shared_ptr<GladGLContext> spGlContext;
+    unsigned int glVersion;
 public:
     virtual ~App() {};
     virtual void configure(GLFWwindow * window) = 0;
     virtual void processUserInput(GLFWwindow * window, glm::vec2 mouse_offset) = 0;
     virtual void updateScene() = 0;
     virtual void render() = 0;
-    virtual void setContext(std::shared_ptr<GladGLContext> spContext) {
-        spGlContext = spContext;
+    virtual void setVersion(unsigned int version) {
+        glVersion = version;
     }
 };

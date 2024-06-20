@@ -29,8 +29,6 @@ glm::vec2 Mouse::getOffset() {
     return glm::vec2(this->pos  - this->pos_old);
 }
 
-std::shared_ptr<GladGLContext> AppFrame::spGlContext = std::make_shared<GladGLContext>();
-
 void error_callback( int error, const char *msg ) {
     std::string s;
     s = " [" + std::to_string(error) + "] " + msg + '\n';
@@ -38,21 +36,11 @@ void error_callback( int error, const char *msg ) {
 }
 
 AppFrame::AppFrame(ScreenResolution resolution, App * app, std::string title) {
-    glfwSetErrorCallback( error_callback );
     if (GL_TRUE != glfwInit()) {
         std::cerr << "Error initialising glfw" << std::endl;    
-    } else {
-        std::cout << "initialising glfw" << std::endl;    
     }
     glfwSetErrorCallback( error_callback );
-    glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 4 );
-    glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 6 );
-    // If you want the opengl debug context from 4.3 onwards, which you do:
-    glfwWindowHint( GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE );
-    glfwWindowHint( GLFW_CLIENT_API, GLFW_OPENGL_API );
-    glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
-
-    std::cout << "Title :" << title << std::endl;
+    
     this->resolution = resolution;
     this->window = glfwCreateWindow(resolution.width, resolution.height, title.c_str(), NULL, NULL);
     if (!this->window) {
@@ -61,16 +49,16 @@ AppFrame::AppFrame(ScreenResolution resolution, App * app, std::string title) {
     }
     glfwMakeContextCurrent(this->window);
 
-    if (!spGlContext.get()) {
-        glfwTerminate();
-        throw std::runtime_error("Failed to initialize GLAD!");
-    }
-    
-    int version = gladLoadGLContext(spGlContext.get(), glfwGetProcAddress);
+    int version = gladLoadGL(glfwGetProcAddress);
     std::cout << "Loaded OpenGL " << GLAD_VERSION_MAJOR(version) << "." << GLAD_VERSION_MINOR(version) << std::endl;
-
+    unsigned int glVersion = 100 * GLAD_VERSION_MAJOR(version) + 10 * GLAD_VERSION_MINOR(version);
     glfwSetFramebufferSizeCallback(this->window, &AppFrame::framebufferSizeCallback);
-    app->setContext(spGlContext);
+    if (glVersion >= 430) {
+        glfwWindowHint( GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE );
+        glfwWindowHint( GLFW_CLIENT_API, GLFW_OPENGL_API );
+        glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
+    }
+    app->setVersion(glVersion);
     this->app = app;
 }
 
@@ -79,7 +67,7 @@ AppFrame::~AppFrame() {
 }
 
 void AppFrame::framebufferSizeCallback(GLFWwindow * window, int width, int height) {
-    spGlContext->Viewport(0, 0, width, height);
+    glViewport(0, 0, width, height);
 }
 
 void AppFrame::processInput(GLFWwindow * window) {

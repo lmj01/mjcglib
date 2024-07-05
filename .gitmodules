@@ -18,3 +18,7 @@
 	path = third/lnlib
 	url = https://github.com/BIMCoderLiang/LNLib.git
 	branch = main
+[submodule "third/stb"]
+	path = third/stb
+	url = https://github.com/nothings/stb.git
+	branch = master

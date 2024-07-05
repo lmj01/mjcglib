@@ -12,7 +12,7 @@ using namespace mygl;
 
 unsigned int createShader(GLenum shaderType, const GLchar * shaderSource);
 
-ShaderConfiguration::ShaderConfiguration()
+ShaderConfiguration::ShaderConfiguration() : num_patchVertices(3)
 {
 	
 }
@@ -28,7 +28,7 @@ ShaderConfiguration::~ShaderConfiguration()
 	this->v_vec4.clear();
 	this->v_vec3.clear();
 	this->v_vec2.clear();
-	// this->v_material.clear();
+	this->v_material.clear();
 }
 
 void ShaderConfiguration::loadIntoShader(Shader * shader) const
@@ -69,10 +69,10 @@ void ShaderConfiguration::loadIntoShader(Shader * shader) const
 	{
 		shader->setVec2(pair.first, pair.second);
 	}
-	// for (auto pair : this->v_material)
-	// {
-	// 	shader->setMaterial(pair.first, pair.second);
-	// }
+	for (auto pair : this->v_material)
+	{
+		shader->setMaterial(pair.first, pair.second);
+	}
 }
 
 void ShaderConfiguration::setBool(const std::string& name, bool value)
@@ -120,15 +120,15 @@ void ShaderConfiguration::setVec2(const std::string & name, glm::vec2 value)
 	this->v_vec2.insert_or_assign(name, value);
 }
 
-// void ShaderConfiguration::setMaterial(const std::string & name, std::shared_ptr<Material> material)
-// {
-// 	this->v_material.insert_or_assign(name, material);
-// }
+void ShaderConfiguration::setMaterial(const std::string & name, std::shared_ptr<Material> material)
+{
+	this->v_material.insert_or_assign(name, material);
+}
 
-// void ShaderConfiguration::setPatchVertices(GLint patchVertices)
-// {
-// 	this->v_patchVertices = patchVertices;
-// }
+void ShaderConfiguration::setPatchVertices(GLint patchVertices)
+{
+	this->num_patchVertices = patchVertices;
+}
 
 bool ShaderConfiguration::getBool(const std::string& name)
 {
@@ -185,16 +185,16 @@ glm::vec2 ShaderConfiguration::getVec2(const std::string& name)
 	return (it == this->v_vec2.end()) ? glm::vec2(0.f) : it->second;
 }
 
-// std::shared_ptr<Material> ShaderConfiguration::getMaterial(const std::string& name)
-// {
-// 	auto it = this->v_material.find(name);
-// 	return (it == this->v_material.end()) ? nullptr : it->second;
-// }
+std::shared_ptr<Material> ShaderConfiguration::getMaterial(const std::string& name)
+{
+	auto it = this->v_material.find(name);
+	return (it == this->v_material.end()) ? nullptr : it->second;
+}
 
-// GLint ShaderConfiguration::getPatchVertices()
-// {
-// 	return v_patchVertices;
-// }
+GLint ShaderConfiguration::getPatchVertices()
+{
+	return this->num_patchVertices;
+}
 
 Shader::Shader(const std::string shader_lib, const std::string vertex_path, 
 	std::optional<const std::string> tessellation_control_path,
@@ -348,40 +348,40 @@ void Shader::setVec2(const std::string& name, glm::vec2 value) const {
 	glUniform2fv(glGetUniformLocation(ID, name.c_str()), 1, glm::value_ptr(value));
 }
 
-// void Shader::setMaterialProperty(const std::string& name, MaterialProperty<glm::vec4> material_property, GLuint texture_unit) {
-// 	setVec4(name + period + value_default,	material_property.value_default);
-// 	setMaterialPropertyCommons(name, material_property, texture_unit);
-// }
+void Shader::setMaterialProperty(const std::string& name, MaterialProperty<glm::vec4> material_property, GLuint texture_unit) {
+	setVec4(name + period + value_default,	material_property.value_default);
+	setMaterialPropertyCommons(name, material_property, texture_unit);
+}
 
-// void Shader::setMaterialProperty(const std::string& name, MaterialProperty<glm::vec3> material_property, GLuint texture_unit) {
-// 	setVec3(name + period + value_default,	material_property.value_default);
-// 	setMaterialPropertyCommons(name, material_property, texture_unit);
-// }
+void Shader::setMaterialProperty(const std::string& name, MaterialProperty<glm::vec3> material_property, GLuint texture_unit) {
+	setVec3(name + period + value_default,	material_property.value_default);
+	setMaterialPropertyCommons(name, material_property, texture_unit);
+}
 
-// void Shader::setMaterialProperty(const std::string& name, MaterialProperty<glm::vec2> material_property, GLuint texture_unit) {
-// 	setVec2(name + period + value_default,	material_property.value_default);
-// 	setMaterialPropertyCommons(name, material_property, texture_unit);
-// }
+void Shader::setMaterialProperty(const std::string& name, MaterialProperty<glm::vec2> material_property, GLuint texture_unit) {
+	setVec2(name + period + value_default,	material_property.value_default);
+	setMaterialPropertyCommons(name, material_property, texture_unit);
+}
 
-// void Shader::setMaterialProperty(const std::string& name, MaterialProperty<float> material_property, GLuint texture_unit) {
-// 	setFloat(name + period + value_default, material_property.value_default);
-// 	setMaterialPropertyCommons(name, material_property, texture_unit);
-// }
+void Shader::setMaterialProperty(const std::string& name, MaterialProperty<float> material_property, GLuint texture_unit) {
+	setFloat(name + period + value_default, material_property.value_default);
+	setMaterialPropertyCommons(name, material_property, texture_unit);
+}
 
-// void Shader::setMaterial(const std::string & name, std::shared_ptr<Material> material) {
-// 	material->bindTextures(0);
-// 	if (shader_render_mode == ShaderRenderingMode::PBR) {
-// 		setMaterialProperty(name + period + "albedo",		material->albedo,		0);
-// 		setMaterialProperty(name + period + "normal",		material->normal,		1);
-// 		setMaterialProperty(name + period + "roughness",	material->roughness,	2);
-// 		setMaterialProperty(name + period + "metallic",		material->metallic,		3);
-// 		setMaterialProperty(name + period + "ao",			material->ao,			4);
-// 		setMaterialProperty(name + period + "height",		material->height,		5);
-// 		setMaterialProperty(name + period + "opacity",		material->opacity,		6);
+void Shader::setMaterial(const std::string & name, std::shared_ptr<Material> material) {
+	material->bindTextures(0);
+	if (eTargetShaderMode == eBuildinTargetShaderMode::PBR) {
+		setMaterialProperty(name + period + "albedo",		material->albedo,		0);
+		setMaterialProperty(name + period + "normal",		material->normal,		1);
+		setMaterialProperty(name + period + "roughness",	material->roughness,	2);
+		setMaterialProperty(name + period + "metallic",		material->metallic,		3);
+		setMaterialProperty(name + period + "ao",			material->ao,			4);
+		setMaterialProperty(name + period + "height",		material->height,		5);
+		setMaterialProperty(name + period + "opacity",		material->opacity,		6);
 
-// 		setFloat(name + period + "height_scale", material->height_scale);
-// 	}
-// }
+		setFloat(name + period + "height_scale", material->height_scale);
+	}
+}
 
 unsigned int Shader::createShader(GLenum shader_type, const GLchar * shader_source, std::string shader_name) {
 	unsigned int shader;

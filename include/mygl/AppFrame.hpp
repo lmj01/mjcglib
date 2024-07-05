@@ -2,23 +2,14 @@
 #include <GLFW/glfw3.h>
 #include <glm/vec2.hpp>
 #include <string>
+#include <mygl/FrameBuffer.hpp>
+#include <mygl/Scene.hpp>
 
 namespace mygl {
-    struct ScreenResolution;
     class Mouse;
     class AppFrame;
     class App;
 }
-
-struct mygl::ScreenResolution {
-	unsigned int width = 800;
-	unsigned int height = 600;
-	ScreenResolution(unsigned int width, unsigned int height) {
-		this->width = width;
-		this->height = height;
-	}
-	ScreenResolution(): width(800), height(600) {}
-};
 
 class mygl::Mouse
 {
@@ -69,6 +60,7 @@ class mygl::App
 private:
 protected:
     unsigned int glVersion;
+    Scene * activeScene = nullptr;
 public:
     virtual ~App() {};
     virtual void configure(GLFWwindow * window) = 0;
@@ -77,5 +69,12 @@ public:
     virtual void render() = 0;
     virtual void setVersion(unsigned int version) {
         glVersion = version;
+    }
+    virtual void setActiveScene(Scene * scene) {
+        this->activeScene = scene;
+    }
+    virtual void forwardUserInputToScene(GLFWwindow * window, glm::vec2 mouse_offset) {
+        this->activeScene->processMouse(mouse_offset.x, mouse_offset.y);
+        this->activeScene->processInput(window);
     }
 };

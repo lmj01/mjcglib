@@ -119,6 +119,7 @@ target_include_directories(${PROJECT_NAME}
         # $<BUILD_INTERFACE:${GLAD_INCLUDE_DIR}>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
     PRIVATE 
+        ${SUBMODULE_DIR}/stb
         ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
